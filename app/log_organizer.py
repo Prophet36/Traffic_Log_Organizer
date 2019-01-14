@@ -108,7 +108,7 @@ class LogOrganizer:
                 for idx, column in enumerate(data_columns):
                     data_columns[idx] += entry[idx]
         except IndexError:
-            print("Incorrect number of data columns. Exiting program.")
+            print("Incorrect number of data columns at line {}. Exiting program.".format(self._current_data_index))
             exit(1)
         else:
             number_of_new_entries = len(data_entries)
