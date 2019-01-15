@@ -9,21 +9,29 @@ class LogOrganizer:
     def __init__(self):
         self._data = list()
         self._organized_data = list()
-        self._time_interval = 0
+        self._time_interval_in_seconds = 0
         self._current_data_index = 0
         self._last_data_index = 0
         self._number_of_data_columns = 0
 
-    def organize_log(self, data_file, time_interval=300, first_entry_index=2):
-        self._time_interval = time_interval
-        self._current_data_index = first_entry_index
+    @property
+    def time_interval_in_seconds(self):
+        return self._time_interval_in_seconds
+
+    @property
+    def organized_data(self):
+        return self._organized_data
+
+    def organize_log(self, data_file, time_interval_in_seconds=300, index_of_first_entry=1):
+        self._time_interval_in_seconds = time_interval_in_seconds
+        self._current_data_index = index_of_first_entry
         try:
             self._get_data(data_file=data_file)
         except FileNotFoundError:
             print("File {} does not exist. Exiting program.".format(data_file))
             exit(1)
         else:
-            self._time_interval = time_interval
+            self._time_interval_in_seconds = time_interval_in_seconds
             self._organize_log()
 
     def _get_data(self, data_file):
@@ -38,7 +46,7 @@ class LogOrganizer:
                 continue
             else:
                 break
-        self._write_to_file()
+        print("Finished organizing log using time interval of {} seconds.".format(self._time_interval_in_seconds))
 
     def _split_and_convert_data_entries(self):
         self._data = [line.split(";") for line in self._data]
@@ -74,7 +82,7 @@ class LogOrganizer:
 
     def _set_correct_date_for_duplicate_data_entry(self, data_entry):
         date_of_previous_data_entry = self._organized_data[-1][0]
-        data_entry[0] = date_of_previous_data_entry + self._time_interval
+        data_entry[0] = date_of_previous_data_entry + self._time_interval_in_seconds
         return data_entry
 
     def _create_new_data_entry(self):
@@ -124,14 +132,22 @@ class LogOrganizer:
         return int(self._data[self._last_data_index + 1][0])
 
     def _approximate_next_date(self):
-        return self._get_current_date() + self._time_interval
+        return self._get_current_date() + self._time_interval_in_seconds
 
-    def _write_to_file(self):
+
+class LogOrganizerDataExporter:
+
+    @staticmethod
+    def export_data(log_organizer):
+        if not isinstance(log_organizer, LogOrganizer):
+            print("Can't extract organized data. Exiting program.")
+            return
+        data = log_organizer.organized_data
         filename = "../data/log_organized_"
-        interval_as_str = str(self._time_interval)
+        interval_as_str = str(log_organizer.time_interval_in_seconds)
         filename += interval_as_str
         filename += ".csv"
-        FileWriter.write_data_as_csv(data=self._organized_data, filename=filename)
+        FileWriter.write_data_as_csv(data=data, filename=filename)
 
 
 if __name__ == "__main__":
@@ -141,4 +157,5 @@ if __name__ == "__main__":
     interval = int(input())
     print('After finishing, file will be found in data folder as "log_organized_{}.csv".'.format(interval))
     organizer = LogOrganizer()
-    organizer.organize_log(data_file=file, time_interval=interval)
+    organizer.organize_log(data_file=file, time_interval_in_seconds=interval)
+    LogOrganizerDataExporter.export_data(log_organizer=organizer)
