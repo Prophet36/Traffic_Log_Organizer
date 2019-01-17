@@ -1,9 +1,8 @@
-import os
-import errno
-import datetime
 import calendar
-from app.file_handlers import FileReader, FileWriter
+import datetime
+
 from app.data_handlers import DataHandler
+from app.file_handlers import FileReader, FileWriter
 
 
 class LogSplitter:
@@ -21,6 +20,7 @@ class LogSplitter:
             print("File {} does not exist. Exiting program.".format(data_file))
         else:
             data = [line.split(";") for line in data]
+            data = [[DataHandler.convert_to_float(value=item) for item in line] for line in data]
             data = [[DataHandler.convert_to_int(value=item) for item in line] for line in data]
             self._data = data
 
@@ -65,12 +65,6 @@ class LogSplitter:
         else:
             time_in = str(time_interval_in_seconds) + "sec"
         file_name = "data/" + "t_" + str(time_in) + "/log_" + str(time_in) + "_" + str(file_number) + ".csv"
-        if not os.path.exists(os.path.dirname(file_name)):
-            try:
-                os.makedirs(os.path.dirname(file_name))
-            except OSError as exc:
-                if exc.errno != errno.EEXIST:
-                    raise
         return file_name
 
     def _create_split_log(self, data, filename):

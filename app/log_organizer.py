@@ -1,7 +1,7 @@
 import copy
 
-from app.file_handlers import FileReader, FileWriter
 from app.data_handlers import DataHandler
+from app.file_handlers import FileReader, FileWriter
 
 
 class LogOrganizer:
@@ -50,9 +50,10 @@ class LogOrganizer:
 
     def _split_and_convert_data_entries(self):
         self._data = [line.split(";") for line in self._data]
-        self._convert_data_to_int()
+        self._convert_data_to_ints_and_floats()
 
-    def _convert_data_to_int(self):
+    def _convert_data_to_ints_and_floats(self):
+        self._data = [[DataHandler.convert_to_float(value=item) for item in line] for line in self._data]
         self._data = [[DataHandler.convert_to_int(value=item) for item in line] for line in self._data]
 
     def _set_number_of_data_columns(self):

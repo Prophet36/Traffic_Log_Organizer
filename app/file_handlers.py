@@ -1,3 +1,7 @@
+import errno
+import os
+
+
 class FileReader:
 
     @staticmethod
@@ -11,6 +15,12 @@ class FileWriter:
 
     @staticmethod
     def write_data_as_csv(data, filename):
+        if not os.path.exists(os.path.dirname(filename)):
+            try:
+                os.makedirs(os.path.dirname(filename))
+            except OSError as exc:
+                if exc.errno != errno.EEXIST:
+                    raise
         with open(filename, 'w') as file:
             for line in data:
                 for idx, item in enumerate(line, start=1):
