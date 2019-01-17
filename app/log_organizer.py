@@ -143,7 +143,7 @@ class LogOrganizerDataExporter:
             print("Can't extract organized data. Exiting program.")
             return
         data = log_organizer.organized_data
-        filename = "../data/log_organized_"
+        filename = "data/log_organized_"
         interval_as_str = str(log_organizer.time_interval_in_seconds)
         filename += interval_as_str
         filename += ".csv"

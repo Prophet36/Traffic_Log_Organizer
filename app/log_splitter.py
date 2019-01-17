@@ -64,7 +64,7 @@ class LogSplitter:
             time_in = "week"
         else:
             time_in = str(time_interval_in_seconds) + "sec"
-        file_name = "../data/" + "t_" + str(time_in) + "/log_" + str(time_in) + "_" + str(file_number) + ".csv"
+        file_name = "data/" + "t_" + str(time_in) + "/log_" + str(time_in) + "_" + str(file_number) + ".csv"
         if not os.path.exists(os.path.dirname(file_name)):
             try:
                 os.makedirs(os.path.dirname(file_name))
@@ -82,11 +82,11 @@ class LogSplitter:
         FileWriter.write_data_as_csv(data=data, filename=filename)
 
     def _split_log_by_date(self, start_date, end_date):
-        file_name = "../data/log"
+        file_name = "data/log"
         if start_date is not None:
             file_name += "_from_" + str(start_date)
         if end_date is not None:
-            file_name += "_to_" + str(last_date)
+            file_name += "_to_" + str(end_date)
         file_name += ".csv"
         split_file = list()
         for idx, line in enumerate(self._data):
