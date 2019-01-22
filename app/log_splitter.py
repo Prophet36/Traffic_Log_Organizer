@@ -112,9 +112,12 @@ class LogSplitterDataCalculator:
                     total_bits[cidx] += line[cidx + first_column - 1] * time_difference
             except TypeError:
                 continue
-        average_bits = [column / total_time / 1024 * 8 for column in total_bits]
-        last_entry = ["Average (kb/s)"] + average_bits
+        average_bits = [column / total_time for column in total_bits]
+        last_entry = ["Average (bit/s)"] + average_bits
         data_with_averages = [line for line in data + [last_entry]]
+        average_bits_in_kilobytes = [column / 1024 * 8 for column in average_bits]
+        last_entry = ["Average (kB/s)"] + average_bits_in_kilobytes
+        data_with_averages = [line for line in data_with_averages + [last_entry]]
         return data_with_averages
 
     @staticmethod
@@ -127,9 +130,11 @@ class LogSplitterDataCalculator:
                         max_values[idx] = line[idx + first_column - 1]
             except TypeError:
                 continue
-        max_values = [value / 1024 * 8 for value in max_values]
-        last_entry = ["Maximum (kb/s)"] + max_values
+        last_entry = ["Maximum (bit/s)"] + max_values
         data_with_maximums = [line for line in data + [last_entry]]
+        max_values_in_kilobytes = [value / 1024 * 8 for value in max_values]
+        last_entry = ["Maximum (kB/s)"] + max_values_in_kilobytes
+        data_with_maximums = [line for line in data_with_maximums + [last_entry]]
         return data_with_maximums
 
 
