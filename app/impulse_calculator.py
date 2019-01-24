@@ -61,15 +61,27 @@ class ImpulseCalculator:
     def _get_impulses(self, data, inc_impulse, out_impulse):
         incoming_impulses = list()
         outgoing_impulses = list()
+        new_inc_impulse = True
+        new_out_impulse = True
         for line in data:
             if isinstance(line[0], str):
                 continue
             if line[1] > inc_impulse:
+                if new_inc_impulse:
+                    incoming_impulses.append(["impulse start"])
+                    new_inc_impulse = False
                 impulse = [line[0], line[1]]
                 incoming_impulses.append(impulse)
+            else:
+                new_inc_impulse = True
             if line[2] > out_impulse:
+                if new_out_impulse:
+                    outgoing_impulses.append(["impulse start"])
+                    new_out_impulse = False
                 impulse = [line[0], line[2]]
                 outgoing_impulses.append(impulse)
+            else:
+                new_out_impulse = True
         return incoming_impulses, outgoing_impulses
 
     def _calculate_number_of_impulses(self, impulses):
@@ -77,23 +89,27 @@ class ImpulseCalculator:
         outgoing_impulses = impulses[1]
         number_of_incoming_impulses = 0
         number_of_outgoing_impulses = 0
-        for idx, item in enumerate(incoming_impulses):
-            try:
-                if item[0] + self._time_interval < incoming_impulses[idx + 1][0]:
-                    number_of_incoming_impulses += 1
-            except IndexError:
+        for item in incoming_impulses:
+            if isinstance(item[0], str) and "start" in item[0]:
                 number_of_incoming_impulses += 1
-        for idx, item in enumerate(outgoing_impulses):
-            try:
-                if item[0] + self._time_interval < outgoing_impulses[idx + 1][0]:
-                    number_of_outgoing_impulses += 1
-            except IndexError:
+        for item in outgoing_impulses:
+            if isinstance(item[0], str) and "start" in item[0]:
                 number_of_outgoing_impulses += 1
         return number_of_incoming_impulses, number_of_outgoing_impulses
 
     def _calculate_average_impulse_time(self, impulses, number_of_impulses):
-        average_incoming_impulse_time = len(impulses[0]) * self._time_interval / number_of_impulses[0]
-        average_outgoing_impulse_time = len(impulses[1]) * self._time_interval / number_of_impulses[1]
+        inc_impulses = 1 if number_of_impulses[0] == 0 else number_of_impulses[0]
+        out_impulses = 1 if number_of_impulses[1] == 0 else number_of_impulses[1]
+        total_time = 0
+        for item in impulses[0]:
+            if "start" not in item:
+                total_time += self._time_interval
+        average_incoming_impulse_time = total_time / inc_impulses
+        total_time = 0
+        for item in impulses[1]:
+            if "start" not in item:
+                total_time += self._time_interval
+        average_outgoing_impulse_time = total_time / out_impulses
         return average_incoming_impulse_time, average_outgoing_impulse_time
 
     def _add_impulse_data(self, impulses, number, avg_time):

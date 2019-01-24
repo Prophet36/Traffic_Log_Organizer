@@ -1,6 +1,7 @@
 from app.log_organizer import LogOrganizer, LogOrganizerDataExporter
 from app.log_splitter import LogSplitter, LogSplitterDateConverter
 from app.impulse_calculator import ImpulseCalculator
+from app.coincidence_calculator import CoincidenceCalculator
 
 
 def traffic_log_organizer():
@@ -10,8 +11,9 @@ def traffic_log_organizer():
               "file,\nwhere all data is separated by this time interval\n(averaging or duplicating entries when "
               "necessary).\n"
               "Files organized in this way can then be split into smaller files:\nby constant time interval (for "
-              "example, daily or weekly logs),\nby specific dates (for example, from 01-01-2016 to 05-25-2016).\n")
-        print("Do you want to organize (o), split (s) log files or calculate impulses (i)? (o/s/i): ")
+              "example, daily or weekly logs),\nby specific dates (for example, from 01-01-2016 to 05-25-2016).\n"
+              "Impulse data can be calculated from processed logs, and coincidences of impulses from other nodes.\n")
+        print("Do you want to organize (o), split (s), calculate impulses (i), or coincidences? (o/s/i/c): ")
         while True:
             organize_or_split = input()
             if organize_or_split == "o":
@@ -22,6 +24,9 @@ def traffic_log_organizer():
                 break
             elif organize_or_split == "i":
                 _calculate_impulses()
+                break
+            elif organize_or_split == "c":
+                _calculate_coincidences()
                 break
             else:
                 print("Incorrect option. Try again (o/s): ")
@@ -116,6 +121,21 @@ def _calculate_impulses():
     calculator = ImpulseCalculator()
     calculator.calculate_impulses_in_directory(file_path=path)
     calculator.parse_impulse_data_in_directory(file_path=path)
+
+
+def _calculate_coincidences():
+    print("Enter path with impulse logs of first node to calculate coincidences for: ")
+    node_a = input()
+    print("Enter path with impulse logs of second node to calculate coincidences with: ")
+    node_b = input()
+    print("Enter time interval (in seconds) of logs impulse logs were based on:\n300 - 5 minutes\n1800 - 30 minutes\n"
+          "7200 - 2 hours\n86400 - 1 day\n604800 - 1 week\n2592000 - 1 month\n31536000 - 1 year\nEnter interval: ")
+    interval = int(input())
+    print('After finishing, files will be found in {} folder, with name starting as "coincidence_with_node".'
+          .format(node_a))
+    coincidence_calculator = CoincidenceCalculator()
+    coincidence_calculator.calculate_coincidences(file_path_node_a=node_a, file_path_node_b=node_b,
+                                                  time_interval=interval)
 
 
 if __name__ == "__main__":
