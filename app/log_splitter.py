@@ -63,6 +63,8 @@ class LogSplitter:
             time_in = "day"
         elif time_interval_in_seconds == 604800:
             time_in = "week"
+        elif time_interval_in_seconds == 2592000:
+            time_in = "month"
         elif time_interval_in_seconds == 31536000:
             time_in = "year"
         else:

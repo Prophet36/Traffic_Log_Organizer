@@ -38,7 +38,7 @@ def _organize_data():
     while True:
         try:
             print("Enter time interval in seconds:\n300 - 5 minutes\n1800 - 30 minutes\n7200 - 2 hours\n86400 - 1 day\n"
-                  "604800 - 1 week\n259200 - 1 month\n31536000 - 1 year\nEnter interval: ")
+                  "604800 - 1 week\n2592000 - 1 month\n31536000 - 1 year\nEnter interval: ")
             interval = int(input())
         except ValueError:
             print("Time interval must be integer.")
@@ -83,7 +83,7 @@ def _split_data():
 
 def _split_by_time_interval(file, print_averages):
     print("Enter time interval in seconds:\n300 - 5 minutes\n1800 - 30 minutes\n7200 - 2 hours\n86400 - 1 day\n"
-          "604800 - 1 week\n259200 - 1 month\n31536000 - 1 year\nEnter interval: ")
+          "604800 - 1 week\n2592000 - 1 month\n31536000 - 1 year\nEnter interval: ")
     interval = 0
     try:
         interval = int(input())
@@ -115,6 +115,7 @@ def _calculate_impulses():
     print('After finishing, files will be found in {} folder, ending with "impulse.csv".'.format(path))
     calculator = ImpulseCalculator()
     calculator.calculate_impulses_in_directory(file_path=path)
+    calculator.parse_impulse_data_in_directory(file_path=path)
 
 
 if __name__ == "__main__":

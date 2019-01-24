@@ -15,10 +15,21 @@ class ImpulseCalculator:
         self._get_file_names_from_path(file_path=file_path)
         self._calculate_impulses_for_files()
 
-    def _get_file_names_from_path(self, file_path):
-        for file in os.listdir(file_path):
-            if not file.endswith("impulse.csv"):
-                self._files.append(file_path + "/" + str(file))
+    def parse_impulse_data_in_directory(self, file_path):
+        self._get_file_names_from_path(file_path=file_path, find_impulses=True)
+        self._parse_impulse_data_for_files()
+
+    def _get_file_names_from_path(self, file_path, find_impulses=False):
+        self._files.clear()
+        if not find_impulses:
+            for file in os.listdir(file_path):
+                if not file.endswith("impulse.csv") and not file.endswith("impulses.csv"):
+                    self._files.append(file_path + "/" + str(file))
+        else:
+            for file in os.listdir(file_path):
+                if file.endswith("impulse.csv") and not file.endswith("total_impulses.csv"):
+                    self._files.append(file_path + "/" + str(file))
+            self._files.sort(key=lambda x: int(x.rsplit(sep="_", maxsplit=2)[-2]))
 
     def _calculate_impulses_for_files(self):
         if len(self._files) > 0:
@@ -96,14 +107,33 @@ class ImpulseCalculator:
         outgoing_impulse_data = [["Outgoing impulses"]] + outgoing_impulse_data
         self._impulse_data = incoming_impulse_data + outgoing_impulse_data
 
-    def _create_impulse_data_file(self, filename):
-        file = filename[:-4] + "_impulse.csv"
+    def _create_impulse_data_file(self, filename, total_impulse=False):
+        if total_impulse:
+            file = filename + "/total_impulses.csv"
+        else:
+            file = filename[:-4] + "_impulse.csv"
         data = [line for line in self._impulse_data]
         self._impulse_data = list()
         FileWriter.write_data_as_csv(data=data, filename=file)
 
+    def _parse_impulse_data_for_files(self):
+        impulse_data = list()
+        if len(self._files) > 0:
+            for file in self._files:
+                impulse_data += self._parse_impulses(file=file)
+            self._impulse_data = [line.split(";") for line in impulse_data]
+            file_name = self._files[0].rsplit(sep="/", maxsplit=1)[0]
+            self._create_impulse_data_file(filename=file_name, total_impulse=True)
+        else:
+            print("No files in directory. Exiting program.")
+            exit(1)
 
-if __name__ == "__main__":
-    calc = ImpulseCalculator()
-    directory = input()
-    calc.calculate_impulses_in_directory(file_path=directory)
+    def _parse_impulses(self, file):
+        data = FileReader.get_file_data(file)
+        name = file.rsplit(sep="/", maxsplit=1)[1].split(sep="_")[1:3]
+        name = name[0] + " " + name[1]
+        impulse_data = [name]
+        for line in data:
+            if "Number of inc" in line or "Average inc" in line or "Number of outg" in line or "Average out" in line:
+                impulse_data.append(line)
+        return impulse_data
