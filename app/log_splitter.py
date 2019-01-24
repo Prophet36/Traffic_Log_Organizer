@@ -19,6 +19,7 @@ class LogSplitter:
         except FileNotFoundError:
             print("File {} does not exist. Exiting program.".format(data_file))
         else:
+            self._file_path = data_file.rsplit(sep="/", maxsplit=1)[0]
             data = [line.split(";") for line in data]
             data = [[DataHandler.convert_to_float(value=item) for item in line] for line in data]
             data = [[DataHandler.convert_to_int(value=item) for item in line] for line in data]
@@ -62,9 +63,11 @@ class LogSplitter:
             time_in = "day"
         elif time_interval_in_seconds == 604800:
             time_in = "week"
+        elif time_interval_in_seconds == 31536000:
+            time_in = "year"
         else:
             time_in = str(time_interval_in_seconds) + "sec"
-        file_name = "data/" + "t_" + str(time_in) + "/log_" + str(time_in) + "_" + str(file_number) + ".csv"
+        file_name = self._file_path + "/t_" + str(time_in) + "/log_" + str(time_in) + "_" + str(file_number) + ".csv"
         return file_name
 
     def _create_split_log(self, data, filename):
@@ -76,7 +79,7 @@ class LogSplitter:
         FileWriter.write_data_as_csv(data=data, filename=filename)
 
     def _split_log_by_date(self, start_date, end_date):
-        file_name = "data/log"
+        file_name = self._file_path + "/log"
         if start_date is not None:
             file_name += "_from_" + str(start_date)
         if end_date is not None:
@@ -149,38 +152,3 @@ class LogSplitterDateConverter:
         dt = datetime.datetime(year, month, day)
         ut = calendar.timegm(dt.timetuple())
         return ut
-
-
-if __name__ == "__main__":
-    print("Enter path and file name to split: ")
-    file = input()
-    print("Do you want to split by constant time intervals (t) or by dates (d)? (t/d): ")
-    split_type = input()
-    print("Do you want to print average and maximum values at the bottom of split log files? (y/n): ")
-    print_averages = input()
-    if print_averages == "y":
-        print_averages = True
-    else:
-        print_averages = False
-    if split_type == "t":
-        print("Enter time interval in seconds:\n300 - 5 minutes\n1800 - 30 minutes\n7200 - 2 hours\n86400 - 1 day\n"
-              "604800 - 1 week\nEnter interval: ")
-        interval = int(input())
-        splitter = LogSplitter(data_file=file, print_avg_and_max=print_averages, first_column_avg=2, last_column_avg=3,
-                               first_column_max=4, last_column_max=5)
-        splitter.split_log(time_interval_in_seconds=interval)
-        print('After finishing, files will be found in data folder as "log_x_y.csv", where x is time interval, y is '
-              'file number.')
-    elif split_type == "d":
-        print("Enter first date (format must be: DD-MM-YYYY): ")
-        first_date = input()
-        first_date = LogSplitterDateConverter.convert_date(date=first_date)
-        print("Enter last date (format must be: DD-MM-YYYY): ")
-        last_date = input()
-        last_date = LogSplitterDateConverter.convert_date(date=last_date)
-        splitter = LogSplitter(data_file=file, print_avg_and_max=print_averages, first_column_avg=2, last_column_avg=3,
-                               first_column_max=4, last_column_max=5)
-        splitter.split_log(start_date=first_date, end_date=last_date)
-        print('After finishing, file will be found in data folder as "log_from_x_to_y.csv", where x and y are dates.')
-    else:
-        print("Incorrect value. Exiting program.")

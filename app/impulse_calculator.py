@@ -82,7 +82,7 @@ class ImpulseCalculator:
 
     def _calculate_average_impulse_time(self, impulses, number_of_impulses):
         average_incoming_impulse_time = len(impulses[0]) * self._time_interval / number_of_impulses[0]
-        average_outgoing_impulse_time = len(impulses[1]) + self._time_interval / number_of_impulses[1]
+        average_outgoing_impulse_time = len(impulses[1]) * self._time_interval / number_of_impulses[1]
         return average_incoming_impulse_time, average_outgoing_impulse_time
 
     def _add_impulse_data(self, impulses, number, avg_time):

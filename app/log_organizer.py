@@ -13,18 +13,24 @@ class LogOrganizer:
         self._current_data_index = 0
         self._last_data_index = 0
         self._number_of_data_columns = 0
+        self._node_name = None
+
+    @property
+    def organized_data(self):
+        return self._organized_data
 
     @property
     def time_interval_in_seconds(self):
         return self._time_interval_in_seconds
 
     @property
-    def organized_data(self):
-        return self._organized_data
+    def node_name(self):
+        return self._node_name
 
-    def organize_log(self, data_file, time_interval_in_seconds=300, index_of_first_entry=1):
+    def organize_log(self, data_file, time_interval_in_seconds=300, index_of_first_entry=1, node_name=None):
         self._time_interval_in_seconds = time_interval_in_seconds
         self._current_data_index = index_of_first_entry
+        self._node_name = node_name
         try:
             self._get_data(data_file=data_file)
         except FileNotFoundError:
@@ -144,19 +150,11 @@ class LogOrganizerDataExporter:
             print("Can't extract organized data. Exiting program.")
             return
         data = log_organizer.organized_data
-        filename = "data/log_organized_"
+        filename = "data/"
+        if log_organizer.node_name is not None:
+            filename += log_organizer.node_name + "/"
+        filename += "log_organized_"
         interval_as_str = str(log_organizer.time_interval_in_seconds)
         filename += interval_as_str
         filename += ".csv"
         FileWriter.write_data_as_csv(data=data, filename=filename)
-
-
-if __name__ == "__main__":
-    print("Enter path and file name to organize: ")
-    file = input()
-    print("Enter time interval (in seconds): ")
-    interval = int(input())
-    print('After finishing, file will be found in data folder as "log_organized_{}.csv".'.format(interval))
-    organizer = LogOrganizer()
-    organizer.organize_log(data_file=file, time_interval_in_seconds=interval)
-    LogOrganizerDataExporter.export_data(log_organizer=organizer)
