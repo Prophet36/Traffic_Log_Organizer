@@ -55,8 +55,11 @@ def _organize_data():
     print('After finishing, file will be found in data/{} folder as "log_organized_{}.csv".'.format(node + "/",
                                                                                                     interval))
     organizer = LogOrganizer()
-    organizer.organize_log(data_file=file, time_interval_in_seconds=interval, node_name=node)
-    LogOrganizerDataExporter.export_data(log_organizer=organizer)
+    try:
+        organizer.organize_log(filename=file, time_interval_sec=interval, node_name=node)
+        LogOrganizerDataExporter.export_data(log_organizer=organizer)
+    except LogOrganizer.LogOrganizerError as e:
+        print("An error occurred while organizing log: {}".format(e))
 
 
 def _split_data():

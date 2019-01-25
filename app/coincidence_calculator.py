@@ -1,7 +1,6 @@
 import os
 
-from app.data_handlers import DataHandler
-from app.file_handlers import FileWriter, FileReader
+from app.file_handler import FileHandler
 
 
 class CoincidenceCalculator:
@@ -51,7 +50,7 @@ class CoincidenceCalculator:
         return inc_impulse_data, out_impulse_data
 
     def _get_single_impulse_file_data(self, file):
-        data = FileReader.get_file_data(file)
+        data = FileHandler.get_data_from_file(file)
         incoming_data = True
         inc_impulse_data = list()
         out_impulse_data = list()
@@ -149,4 +148,4 @@ class CoincidenceCalculator:
             data.append([item])
         file_name = self._node_b_name.rsplit("/")[-2]
         file_name = self._node_a_name + "/coincidence_with_node_" + file_name + ".csv"
-        FileWriter.write_data_as_csv(data=data, filename=file_name)
+        FileWriter.write_data_to_file(data=data, filename=file_name)

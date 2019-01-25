@@ -1,7 +1,7 @@
 import os
 
-from app.data_handlers import DataHandler
-from app.file_handlers import FileReader, FileWriter
+from app.data_handler import DataHandler
+from app.file_handler import FileHandler
 
 
 class ImpulseCalculator:
@@ -40,7 +40,7 @@ class ImpulseCalculator:
             exit(1)
 
     def _calculate_impulses(self, file):
-        data = FileReader.get_file_data(file)
+        data = FileHandler.get_data_from_file(file)
         data = [line.split(";") for line in data]
         data = [[DataHandler.convert_to_float(value=item) for item in line] for line in data]
         data = [[DataHandler.convert_to_int(value=item) for item in line] for line in data]
@@ -130,7 +130,7 @@ class ImpulseCalculator:
             file = filename[:-4] + "_impulse.csv"
         data = [line for line in self._impulse_data]
         self._impulse_data = list()
-        FileWriter.write_data_as_csv(data=data, filename=file)
+        FileWriter.write_data_to_file(data=data, filename=file)
 
     def _parse_impulse_data_for_files(self):
         impulse_data = list()
@@ -145,7 +145,7 @@ class ImpulseCalculator:
             exit(1)
 
     def _parse_impulses(self, file):
-        data = FileReader.get_file_data(file)
+        data = FileHandler.get_data_from_file(file)
         name = file.rsplit(sep="/", maxsplit=1)[1].split(sep="_")[1:3]
         name = name[0] + " " + name[1]
         impulse_data = [name]

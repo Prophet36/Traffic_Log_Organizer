@@ -2,19 +2,16 @@ import errno
 import os
 
 
-class FileReader:
+class FileHandler:
 
     @staticmethod
-    def get_file_data(filename):
+    def get_data_from_file(filename):
         with open(filename, "r") as file:
             data = file.read().splitlines()
             return data
 
-
-class FileWriter:
-
     @staticmethod
-    def write_data_as_csv(data, filename):
+    def write_data_to_file(data, filename):
         if not os.path.exists(os.path.dirname(filename)):
             try:
                 os.makedirs(os.path.dirname(filename))
@@ -23,9 +20,5 @@ class FileWriter:
                     raise
         with open(filename, 'w') as file:
             for line in data:
-                for idx, item in enumerate(line, start=1):
-                    file.write(str(item))
-                    if idx < len(line):
-                        file.write(";")
-                    else:
-                        file.write("\n")
+                file.write(line)
+                file.write("\n")

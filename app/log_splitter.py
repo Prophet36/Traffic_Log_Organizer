@@ -1,8 +1,8 @@
 import calendar
 import datetime
 
-from app.data_handlers import DataHandler
-from app.file_handlers import FileReader, FileWriter
+from app.data_handler import DataHandler
+from app.file_handler import FileHandler
 
 
 class LogSplitter:
@@ -15,7 +15,7 @@ class LogSplitter:
         self._first_column_max = first_column_max
         self._last_column_max = last_column_max
         try:
-            data = FileReader.get_file_data(filename=data_file)
+            data = FileHandler.get_data_from_file(filename=data_file)
         except FileNotFoundError:
             print("File {} does not exist. Exiting program.".format(data_file))
         else:
@@ -78,7 +78,7 @@ class LogSplitter:
                                                                      last_column=self._last_column_avg)
             data = LogSplitterDataCalculator.calculate_max_value(data=data, first_column=self._first_column_max,
                                                                  last_column=self._last_column_max)
-        FileWriter.write_data_as_csv(data=data, filename=filename)
+        FileWriter.write_data_to_file(data=data, filename=filename)
 
     def _split_log_by_date(self, start_date, end_date):
         file_name = self._file_path + "/log"
