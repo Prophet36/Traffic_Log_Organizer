@@ -83,6 +83,8 @@ class CoincidenceCalculator:
             node_a = self._node_b_data[0]
             node_b = self._node_a_data[0]
         inc_coincidence_data = list()
+        new_impulse = True
+        number_of_impulses = 0
         last_idx = 0
         for impulse_a in node_a:
             impulse_a_date = int(impulse_a.split(";")[0])
@@ -90,9 +92,21 @@ class CoincidenceCalculator:
                 impulse_b_date = int(impulse_b.split(";")[0])
                 predicted_date = impulse_b_date + self._time_interval
                 if impulse_b_date <= impulse_a_date <= predicted_date:
+                    if new_impulse:
+                        inc_coincidence_data.append("impulse starts")
+                        number_of_impulses += 1
+                        new_impulse = False
                     inc_coincidence_data.append(impulse_a)
                     last_idx = idx + 1
                     break
+            else:
+                new_impulse = True
+        inc_coincidence_data.append("Number of incoming impulses;{}".format(number_of_impulses))
+        total_impulse_time = 0
+        for line in inc_coincidence_data:
+            if "impulse" not in line:
+                total_impulse_time += self._time_interval
+        inc_coincidence_data.append("Average incoming impulse time;{}".format(total_impulse_time/number_of_impulses))
         if self._node_a_out_start_date >= self._node_b_out_start_date:
             node_a = self._node_a_data[1]
             node_b = self._node_b_data[1]
@@ -100,6 +114,8 @@ class CoincidenceCalculator:
             node_a = self._node_b_data[1]
             node_b = self._node_a_data[1]
         out_coincidence_data = list()
+        new_impulse = True
+        number_of_impulses = 0
         last_idx = 0
         for impulse_a in node_a:
             impulse_a_date = int(impulse_a.split(";")[0])
@@ -107,9 +123,21 @@ class CoincidenceCalculator:
                 impulse_b_date = int(impulse_b.split(";")[0])
                 predicted_date = impulse_b_date + self._time_interval
                 if impulse_b_date <= impulse_a_date <= predicted_date:
+                    if new_impulse:
+                        out_coincidence_data.append("impulse starts")
+                        number_of_impulses += 1
+                        new_impulse = False
                     out_coincidence_data.append(impulse_a)
                     last_idx = idx + 1
                     break
+            else:
+                new_impulse = True
+        out_coincidence_data.append("Number of outgoing impulses;{}".format(number_of_impulses))
+        total_impulse_time = 0
+        for line in out_coincidence_data:
+            if "impulse" not in line:
+                total_impulse_time += self._time_interval
+        out_coincidence_data.append("Average outgoing impulse time;{}".format(total_impulse_time/number_of_impulses))
         self._coincidence_data = inc_coincidence_data, out_coincidence_data
 
     def _create_coincidence_file(self):
